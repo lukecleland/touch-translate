@@ -9,34 +9,29 @@ var app = express();
 var apikey = 'AIzaSyAl2_VXl-axjtU_zGj-s8h1ShY3H3Le_14';
 var googleTranslate = require('google-translate')(apikey);
 
-
 var server = app.listen(8080, function(){
     console.log('Server Started');
 });
 
-var io = require('socket.io').listen(server, function(){
-    console.log('Socket io Started');
+var io = require('socket.io').listen(server);
+
+io.on('connection', function(socket){
+  console.log('a user connected.. emitting book');
+    fs.readFile(__dirname + '/books/starwars.txt', 'utf8', function (err, data) {
+        var bookarray = data.split(' ');
+        for(i=200;i<1200;i++) {
+            io.emit('book', bookarray[i]);
+        }
+    });
 });
 
-fs.readFile(__dirname + '/books/book.txt', 'utf8', function (err, data) {
-    var bookarray = data.split('. ');
-    var arrayCount = [];
-    
-    for(i=0;i<bookarray.length;i++) {
-        r = random.integer(0, 10);
-        if (r == 1) {
-            arrayCount[i] = i;
-            googleTranslate.translate(bookarray[i], 'de', function(err, translation) {
-                bookarray[arrayCount[i]] = translation.translatedText+'*********';
-            });
-        }
-    }
-    
-    setTimeout(function(){
-        for(i=0;i<bookarray.length;i++) {
-            console.log(bookarray[i]+'. ');
-        }
-    }, 10000);
+app.get('/', function(req, res){
+    res.sendfile("index.html");
 });
 
-
+app.get('/api/translate/:word', function (req, res, next) {
+    googleTranslate.translate(req.params.word, 'en', function(err, translation) {
+        message = translation.translatedText;
+        res.json(message);
+    });
+});
