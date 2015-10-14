@@ -4,33 +4,71 @@
 
 
 <style>
-
-    a {
-        text-decoration: none;
+    
+    html, body {
+        height:100%;
         color:black;
         font-family: arial;
+        line-height: 1.6;
+        font-size:30pt;
+        color:black;
+    }
+    
+    a {
+        text-decoration: none;
+        
     }
     
     .content {
-        width:400px;  
         padding:20px;
+        padding-top:120px;
     }
+    
+    .translation {
+        height:100px;
+        position:fixed;
+        width:100%;
+        bottom:0px;
+        left:0;
+        background-color:white;
+        border-top:2px solid black;
+        padding: 20px;
+        text-align: center;
+        font-size:40pt;
+    }
+    
+    .header {
+        height:40px;
+        position:fixed;
+        width:100%;
+        top:0px;
+        left:0;
+        background-color:white;
+        border-bottom:2px solid black;
+        padding: 20px;
+        text-align: center;
+        font-size:20pt;
+    }
+    
     
 </style>
 
 
 <script src="/socket.io/socket.io.js"></script>
 
-
+<div class="header">
+    Touch Translator &copy; 2015 Luke Cleland
+</div>
 <div class="content">
 </div>
-
+<div class="translation">
+</div>
 
 
 <script>
     var socket = io();
-    socket.on('book', function(msg){
-        $('.content').append($('<a href="#" class="word">').text(msg+' '));
+    socket.on('book', function(msg) {
+        $('.content').append($('<a href="#" class="word">').html(msg+' '));
     });
     
     $(document).ready(function() {
@@ -41,7 +79,7 @@
                     type: "GET",
                     url: "/api/translate/"+word
                 }).done(function(result) {
-                    alert(result);
+                    $('.translation').html(word+' = '+result);
                 });
                 return false;
             });
